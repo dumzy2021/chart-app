@@ -16,7 +16,6 @@ export class LineChartComponent implements OnInit {
     this.chartService.coinsData().subscribe({
       next: (value) => {
         let result = value.data;
-        console.log(result);
         if (result?.coins?.length > 0) {
           this.dataset = result.coins.map((coins: any) => coins.price);
           this.labels = result.coins.map((coins: any) => coins.name);
@@ -38,7 +37,7 @@ export class LineChartComponent implements OnInit {
         labels: this.labels,
         datasets: [
           {
-            label: '# of Votes',
+            label: 'Coin Market Price',
             data: this.dataset,
             borderColor: 'rgb(75, 192, 192)',
             borderWidth: 2,
