@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import Chart from 'chart.js/auto';
+import { finalize } from 'rxjs';
 import { ChartService } from 'src/app/services/chart.service';
 @Component({
   selector: 'app-line-chart',
@@ -10,24 +11,28 @@ export class LineChartComponent implements OnInit {
   chart: any = [];
   labels: any = [];
   dataset: any = [];
-
+  loading: boolean = false;
   constructor(private chartService: ChartService) {}
   ngOnInit(): void {
-    this.chartService.coinsData().subscribe({
-      next: (value) => {
-        let result = value.data;
-        if (result?.coins?.length > 0) {
-          this.dataset = result.coins.map((coins: any) => coins.price);
-          this.labels = result.coins.map((coins: any) => coins.name);
+    this.loading = true;
+    this.chartService
+      .coinsData()
+      .pipe(finalize(() => (this.loading = false)))
+      .subscribe({
+        next: (value) => {
+          let result = value.data;
+          if (result?.coins?.length > 0) {
+            this.dataset = result.coins.map((coins: any) => coins.price);
+            this.labels = result.coins.map((coins: any) => coins.name);
+            this.initializeChart();
+          } else {
+            this.initializeChart();
+          }
+        },
+        error: (err) => {
           this.initializeChart();
-        } else {
-          this.initializeChart();
-        }
-      },
-      error: (err) => {
-        this.initializeChart();
-      },
-    });
+        },
+      });
   }
 
   initializeChart() {
